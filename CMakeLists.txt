@@ -18,6 +18,13 @@ qt_add_qml_module(appSerenify
     QML_FILES
         Main.qml
         QML_FILES PlusButton.qml
+        QML_FILES TrashButton.qml
+        RESOURCES resources.qrc
+        RESOURCES Images/Trash.png
+)
+
+qt_add_resources(appSerenify}_resources
+    FILES Resources/resources.qrc
 )
 
 # Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.

@@ -11,4 +11,11 @@ Window {
         radius: 30
         col: "blue"
     }
+    TrashButton {
+        anchors.top: parent.top
+        anchors.horizontalCenter: parent.horizontalCenter
+        anchors.topMargin: 10
+        radius: 50
+        col: "red"
+    }
 }
