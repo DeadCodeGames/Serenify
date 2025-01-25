@@ -28,8 +28,8 @@ Item {
         Text {
             anchors.centerIn: parent
             text: "+"
-            font.family: "Times New Roman"
-            font.pixelSize: button1.width*0.75
+            font.family: "Poppins"
+            font.pixelSize: button1.width*0.65
             font.bold: true
             color: "white"
         }
