@@ -4,6 +4,7 @@ Item {
     id: root
     property alias col: button1._btnColor
     property alias radius: button1.radius
+    signal clicked
 
     width: 50
     height: 50
@@ -54,7 +55,11 @@ Item {
                     duration: 150
                 }
             }
-
         ]
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.clicked()
     }
 }
