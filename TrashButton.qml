@@ -17,7 +17,9 @@ Item {
 
         Image {
                 source: "qrc:/qt/qml/Serenify/Images/Trash.png"
-                anchors.fill: parent
+                width: root.width * 0.8
+                fillMode: Image.PreserveAspectFit
+                anchors.centerIn: parent
                 smooth: true
                 MouseArea {
                     anchors.fill: parent
