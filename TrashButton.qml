@@ -4,6 +4,7 @@ Item {
     id: root
     property alias col: buttonTrash._btnColor
     property alias radius: buttonTrash.radius
+    signal clicked
     width: 50
     height: 50
 
@@ -73,6 +74,10 @@ Item {
             }
 
         ]
+    }
+    MouseArea{
+        anchors.fill: parent
+        onClicked: root.clicked()
     }
 }
 
