@@ -4,6 +4,7 @@ Item {
     id: root
     property alias col: button1._btnColor
     property alias radius: button1.radius
+    signal clicked
 
     width: 50
     height: 50
@@ -28,7 +29,7 @@ Item {
         Text {
             anchors.centerIn: parent
             text: "+"
-            font.family: "Poppins"
+            font.family: "Times New Roman"
             font.pixelSize: button1.width*0.65
             font.bold: true
             color: "white"
@@ -54,7 +55,11 @@ Item {
                     duration: 150
                 }
             }
-
         ]
+    }
+
+    MouseArea {
+        anchors.fill: parent
+        onClicked: root.clicked()
     }
 }
