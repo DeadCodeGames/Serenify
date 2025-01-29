@@ -13,10 +13,18 @@ Item {
         radius: 10
         height: 60
 
-        Text {
+        TextInput {
             anchors.centerIn: parent
             text: model.text
+            color: mode ? "black" : "white"
             font.pointSize: 16
+            selectByMouse: true
+            onFocusChanged:{
+                if (focus) selectAll()
+            }
+
+            Keys.onEnterPressed: focus = false
+            Keys.onReturnPressed: focus = false
         }
     }
 }

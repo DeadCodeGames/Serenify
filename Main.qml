@@ -17,6 +17,7 @@ Window {
     property color taskBgColor: mode ? "white" : "#2e2c2c"
 
 
+
     color: mode ? "white" : "#2e2c2c"
 
     ListModel {
@@ -43,7 +44,7 @@ Window {
         radius: 30
         col: root.plusColor
         onClicked: {
-            lModel.append({ text: "Item " + (lModel.count + 1) });
+            lModel.append({ text: "Item " + (lModel.count + 1)});
         }
     }
 
