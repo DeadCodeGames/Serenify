@@ -22,6 +22,7 @@ qt_add_qml_module(appSerenify
         RESOURCES resources.qrc
         RESOURCES Images/Trash.png
         QML_FILES Task.qml
+        QML_FILES
 )
 
 qt_add_resources(appSerenify}_resources
