@@ -2,26 +2,92 @@ import QtQuick
 import QtQuick.Layouts
 
 Item {
+    id: rootItem
     width: lView.width
     height: 70
+
+    Behavior on height {
+        NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+    }
+
     Rectangle {
         id: rec
         width: parent.width - 20
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
-        color: root.taskBgColor
         border.color: root.taskBorderColor
         border.width: 2
         radius: 10
         height: 60
-        // name, priority, deadline, description
+        color: root.taskBgColor
+
+        property bool isOpened: false
+
+        Behavior on height {
+            NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+        }
+
+        MouseArea {
+            anchors.fill: parent
+            hoverEnabled: true
+
+            onEntered: {
+                gradientBackground.fadeDirection = "in";
+                fadeTimer.start();
+            }
+
+            onExited: {
+                gradientBackground.fadeDirection = "out";
+                fadeTimer.start();
+            }
+
+            onClicked: {
+                rec.isOpened = !rec.isOpened;
+                rec.height = rec.isOpened ? 120 : 60;
+                rootItem.height = rec.isOpened ? 130 : 70;
+            }
+        }
+
+        Rectangle {
+            id: gradientBackground
+            anchors.fill: parent
+            anchors.margins: parent.border.width
+            anchors.centerIn: parent
+            radius: parent.radius - parent.border.width
+            opacity: 0
+
+            Timer {
+                id: fadeTimer
+                interval: 1
+                repeat: true
+                onTriggered: {
+                    if (gradientBackground.opacity < 1 && gradientBackground.opacity >= 0 && gradientBackground.fadeDirection === "in") {
+                        gradientBackground.opacity += 0.02;
+                    } else if (gradientBackground.opacity > 0 && gradientBackground.fadeDirection === "out") {
+                        gradientBackground.opacity -= 0.02;
+                    } else {
+                        fadeTimer.stop();
+                    }
+                }
+            }
+
+            property string fadeDirection: ""
+
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: root.taskBgColor }
+                GradientStop { position: 0.5; color: root.taskBgColor }
+                GradientStop { position: 1.0; color: root.taskBorderColor }
+            }
+        }
+
         Row {
             anchors.fill: parent
             anchors.leftMargin: 10
             spacing: rec.width - leftCol.width - 30
             Column {
                 id: leftCol
-                anchors.verticalCenter: parent.verticalCenter
+                anchors.top: parent.top
+                anchors.topMargin: 5
                 Text {
                     Layout.bottomMargin: 5
                     id: nameLbl
@@ -31,9 +97,23 @@ Item {
                     color: root.textColor
                 }
                 Text {
-                    id: deeadlineLbl
+                    id: deadlineLbl
                     text: model.deadline
                     color: root.textColor
+                    Layout.bottomMargin: 5
+                }
+                Text {
+                    id: descriptionLbl
+                    text: model.description
+                    width: rootItem.width - 40
+                    wrapMode: Text.Wrap
+                    color: root.textColor
+                    font.pointSize: 8
+                    opacity: 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: 200 }
+                    }
                 }
             }
             Column {
@@ -42,15 +122,9 @@ Item {
                 Rectangle {
                     id: priorityRec
                     function assignColor(){
-                        if(model.priority == "Low"){
-                            return "green"
-                        }
-                        else if(model.priority == "Medium"){
-                            return "yellow"
-                        }
-                        else if(model.priority == "High"){
-                            return "red"
-                        }
+                        if (model.priority == "Low") return "green";
+                        if (model.priority == "Medium") return "yellow";
+                        if (model.priority == "High") return "red";
                     }
                     color: assignColor()
                     width: 12
@@ -58,6 +132,38 @@ Item {
                     radius: 10
                 }
             }
+        }
+
+        states: [
+            State {
+                name: "collapsed"
+                PropertyChanges { target: descriptionLbl; opacity: 0 }
+            },
+            State {
+                name: "expanded"
+                PropertyChanges { target: descriptionLbl; opacity: 1 }
+            }
+        ]
+
+        transitions: [
+            Transition {
+                from: "collapsed"
+                to: "expanded"
+                SequentialAnimation {
+                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 200 }
+                }
+            },
+            Transition {
+                from: "expanded"
+                to: "collapsed"
+                SequentialAnimation {
+                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 200 }
+                }
+            }
+        ]
+
+        onIsOpenedChanged: {
+            rec.state = rec.isOpened ? "expanded" : "collapsed";
         }
     }
 }
