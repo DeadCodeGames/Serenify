@@ -1,5 +1,6 @@
 import QtQuick
 import QtQuick.Controls.Basic 2.15
+import QtQuick.Layouts
 
 Window {
     width: 400
@@ -92,13 +93,17 @@ Window {
             spacing: 10
 
             Column {
+                anchors.horizontalCenter: parent.horizontalCenter
                 TextField {
                     id: taskName
                     placeholderText: "Task Name (Max 40 chars)"
                     onTextChanged: root.validateInput()
+                    maximumLength: 40
+                    clip: true
+                    width: 200
                     background: Rectangle {
                         color: "transparent"
-                        border.color: taskName.text.length === 0 || taskName.text.length > 40 ? "red" : "green"
+                        border.color: taskName.text.length === 0 ? "red" : "green"
                         border.width: 1
                         radius: 5
                     }
@@ -112,11 +117,15 @@ Window {
             }
 
             Column {
+                anchors.horizontalCenter: parent.horizontalCenter
                 TextField {
                     id: taskDeadline
                     color: root.textColor
                     placeholderText: "Deadline (YYYY-MM-DD)"
                     onTextChanged: root.validateInput()
+                    maximumLength: 100
+                    clip: true
+                    width: 200
                     background: Rectangle {
                         color: "transparent"
                         border.color: taskDeadline.text.length === 0 ? "red" : "green"
@@ -132,21 +141,44 @@ Window {
                 }
             }
 
-            TextField {
-                id: taskDescription
-                placeholderText: "Description (Optional)"
-                color: root.textColor
+            Column {
+                anchors.horizontalCenter: parent.horizontalCenter
+                TextField {
+                    id: taskDescription
+                    color: root.textColor
+                    placeholderText: "Description (optional)"
+                    onTextChanged: root.validateInput()
+                    maximumLength: 100
+                    clip: true
+                    width: 200
+                    background: Rectangle {
+                        color: "transparent"
+                        border.color: taskDescription.text.length > 0 ? "green" : "black"
+                        border.width: 1
+                        radius: 5
+                    }
+                }
+                Text {
+                    text: taskDeadline.text.length >= 100 ? "Description too long!" : ""
+                    color: "red"
+                    font.pixelSize: 10
+                    visible: taskDeadline.text.length === 0
+                }
             }
 
             ComboBox {
+                anchors.horizontalCenter: parent.horizontalCenter
                 id: taskPriority
                 model: ["Low", "Medium", "High"]
+                width: 100
             }
 
             Button {
+                anchors.horizontalCenter: parent.horizontalCenter
                 id: addButton
                 text: "Add Task"
                 enabled: false
+                width: 100
                 onClicked: {
                     lModel.append({
                         name: taskName.text,
@@ -168,7 +200,7 @@ Window {
     }
 
     function validateInput() {
-        let isValid = taskName.text.length > 0 && taskName.text.length <= 40 && taskDeadline.text.length > 0
+        let isValid = taskName.text.length > 0 && taskName.text.length <= 40 && taskDeadline.text.length > 0 && taskDescription.text.length <= 100
         addButton.enabled = isValid
     }
 }

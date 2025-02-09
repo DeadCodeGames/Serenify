@@ -100,7 +100,7 @@ Item {
                     id: deadlineLbl
                     text: model.deadline
                     color: root.textColor
-                    Layout.bottomMargin: 5
+                    Layout.bottomMargin: 6
                 }
                 Text {
                     id: descriptionLbl
@@ -110,9 +110,36 @@ Item {
                     color: root.textColor
                     font.pointSize: 8
                     opacity: 0
-
-                    Behavior on opacity {
-                        NumberAnimation { duration: 200 }
+                }
+                Item {
+                    y: 74
+                    Row{
+                        id: buttonRow
+                        spacing: 10
+                        Rectangle {
+                            id: trashTask
+                            width: 33
+                            height: 33
+                            color: "red"
+                            radius: 20
+                            opacity: 0
+                        }
+                        Rectangle {
+                            id: editTask
+                            width: 33
+                            height: 33
+                            color: "yellow"
+                            radius: 20
+                            opacity: 0
+                        }
+                        Rectangle {
+                            id: finishTask
+                            width: 33
+                            height: 33
+                            color: "green"
+                            radius: 20
+                            opacity: 0
+                        }
                     }
                 }
             }
@@ -138,10 +165,17 @@ Item {
             State {
                 name: "collapsed"
                 PropertyChanges { target: descriptionLbl; opacity: 0 }
+                PropertyChanges { target: trashTask; opacity: 0 }
+                PropertyChanges { target: editTask; opacity: 0 }
+                PropertyChanges { target: finishTask; opacity: 0 }
             },
             State {
                 name: "expanded"
                 PropertyChanges { target: descriptionLbl; opacity: 1 }
+                PropertyChanges { target: trashTask; opacity: 1 }
+                PropertyChanges { target: editTask; opacity: 1 }
+                PropertyChanges { target: finishTask; opacity: 1 }
+
             }
         ]
 
@@ -149,15 +183,13 @@ Item {
             Transition {
                 from: "collapsed"
                 to: "expanded"
-                SequentialAnimation {
-                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 200 }
-                }
-            },
-            Transition {
-                from: "expanded"
-                to: "collapsed"
-                SequentialAnimation {
-                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 200 }
+                reversible: true
+                ParallelAnimation {
+                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 100 }
+                    NumberAnimation { target: trashTask; property: "opacity"; duration: 100 }
+                    NumberAnimation { target: editTask; property: "opacity"; duration: 100 }
+                    NumberAnimation { target: finishTask; property: "opacity"; duration: 100 }
+
                 }
             }
         ]
