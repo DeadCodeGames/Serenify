@@ -14,8 +14,8 @@
         property bool mode: true // False = dark mode, True = light mode
         property color trashColor: mode ? "red" : "#850900"
         property color plusColor: mode ? "blue" : "#03076b"
-        property color taskBorderColor: mode ? "#ff9991" : "red"
-        property color taskBgColor: mode ? "white" : "#171716" // Change to be the main bg color
+        property color borderColor: mode ? "#ff9991" : "red"
+        property color bgColor: mode ? "white" : "#171716" // Change to be the main bg color
         property color textColor: mode ? "black" : "white"
 
         color: mode ? "white" : "#171716"
@@ -36,42 +36,38 @@
 
             }
         }
-
-        PlusButton {
+        Row{
             anchors.bottom: parent.bottom
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.bottomMargin: 10
-            radius: 30
-            col: root.plusColor
-            onClicked: {
-                taskPopup.open()
-            }
-        }
+            spacing: 10
 
-        TrashButton {
-            anchors.bottom: parent.bottom
-            anchors.right: parent.right
-            anchors.bottomMargin: 10
-            anchors.rightMargin: 10
-            radius: 50
-            col: root.trashColor
-            onClicked: {
-                if(lModel.count > 0) lModel.remove(lModel.count-1)
+            RoundButton {
+                width: 50
+                height: 50
+                text: "Mode"
+                radius: 50
+                onClicked: {
+                    root.mode = !root.mode
+                }
             }
-        }
 
-        RoundButton {
-            width: 50
-            height: 50
-            text: "Mode"
-            anchors.bottom: parent.bottom
-            anchors.left: parent.left
-            anchors.bottomMargin: 10
-            anchors.leftMargin: 10
-            radius: 50
-            onClicked: {
-                root.mode = !root.mode
+            PlusButton {
+                radius: 30
+                col: root.plusColor
+                onClicked: {
+                    taskPopup.open()
+                }
             }
+
+            TrashButton {
+                radius: 50
+                col: root.trashColor
+                onClicked: {
+                    if(lModel.count > 0) lModel.remove(lModel.count-1)
+                }
+            }
+
         }
 
         Popup {
@@ -82,14 +78,22 @@
             focus: true
             anchors.centerIn: parent
             background: Rectangle {
-                color: root.taskBgColor
+                color: root.bgColor
                 radius: 10
-                border.color: root.taskBorderColor
+            }
+
+            Text {
+                text: "Create a task"
+                color: root.textColor
+                font.pixelSize: 24
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.bottomMargin: 10
             }
 
             Column {
                 anchors.fill: parent
                 anchors.margins: 20
+                anchors.topMargin: 50
                 spacing: 10
 
                 Column {
@@ -116,27 +120,7 @@
                     }
                 }
 
-                Column {
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    Rectangle {
-                        id: dateTimePopupBtn
-                        color: root.taskBgColor
-                        width: 100
-                        height: taskName.height
-                        Text {
-                            text: dateTimeSelector.selectedDate != "" ? dateTimeSelector.selectedDate : "No date selected."
-                        }
 
-                        MouseArea{
-                            anchors.fill: parent
-                            onClicked: {
-                                dateTimeSelector.open()
-                                dateTimeSelector.updateTumblersFromDate()
-                                dateTimeSelector.refreshAvailableOptions()
-                            }
-                        }
-                    }
-                }
 
                 Column {
                     anchors.horizontalCenter: parent.horizontalCenter
@@ -153,6 +137,28 @@
                             border.color: taskDescription.text.length > 0 ? "green" : "black"
                             border.width: 1
                             radius: 5
+                        }
+                    }
+                }
+
+                Column {
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    Rectangle {
+                        id: dateTimePopupBtn
+                        color: root.bgColor
+                        width: 100
+                        height: taskName.height
+                        Text {
+                            text: dateTimeSelector.selectedDate != "" ? dateTimeSelector.selectedDate : "No date selected."
+                        }
+
+                        MouseArea{
+                            anchors.fill: parent
+                            onClicked: {
+                                dateTimeSelector.open()
+                                dateTimeSelector.updateTumblersFromDate()
+                                dateTimeSelector.refreshAvailableOptions()
+                            }
                         }
                     }
                 }

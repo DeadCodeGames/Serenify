@@ -421,7 +421,7 @@ Popup {
 
     background: Rectangle {
         radius: 10
-        color: root.taskBgColor
+        color: root.bgColor
     }
 
     ColumnLayout {

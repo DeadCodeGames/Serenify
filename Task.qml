@@ -15,11 +15,11 @@ Item {
         width: parent.width - 20
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
-        border.color: root.taskBorderColor
+        border.color: root.borderColor
         border.width: 2
         radius: 10
         height: 60
-        color: root.taskBgColor
+        color: root.bgColor
 
         property bool isOpened: false
 
@@ -74,9 +74,9 @@ Item {
             property string fadeDirection: ""
 
             gradient: Gradient {
-                GradientStop { position: 0.0; color: root.taskBgColor }
-                GradientStop { position: 0.5; color: root.taskBgColor }
-                GradientStop { position: 1.0; color: root.taskBorderColor }
+                GradientStop { position: 0.0; color: root.bgColor }
+                GradientStop { position: 0.5; color: root.bgColor }
+                GradientStop { position: 1.0; color: root.borderColor }
             }
         }
 
