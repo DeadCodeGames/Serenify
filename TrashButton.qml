@@ -24,12 +24,6 @@ Item {
                 smooth: true
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: {
-                        console.log("Image clicked!")
-                    }
-                }
-                MouseArea {
-                    anchors.fill: parent
                     hoverEnabled: true
                     onEntered: {
                         buttonTrash.state = "hovering"
@@ -38,7 +32,6 @@ Item {
                         buttonTrash.state = "normal"
                     }
                 }
-
             }
 
         MouseArea {

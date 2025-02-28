@@ -23,6 +23,7 @@ qt_add_qml_module(appSerenify
         RESOURCES Images/Trash.png
         QML_FILES Task.qml
         QML_FILES
+        QML_FILES TimeDateSelector.qml
 )
 
 qt_add_resources(appSerenify}_resources

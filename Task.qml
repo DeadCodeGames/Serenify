@@ -123,6 +123,21 @@ Item {
                             color: "red"
                             radius: 20
                             opacity: 0
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    lModel.remove(model.id)
+                                }
+                            }
+                            Image {
+                                source: "qrc:/qt/qml/Serenify/Images/Trash.png"
+                                width: trashTask.width * 0.8
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+                                smooth: true
+                            }
+
                         }
                         Rectangle {
                             id: editTask
@@ -175,7 +190,6 @@ Item {
                 PropertyChanges { target: trashTask; opacity: 1 }
                 PropertyChanges { target: editTask; opacity: 1 }
                 PropertyChanges { target: finishTask; opacity: 1 }
-
             }
         ]
 
