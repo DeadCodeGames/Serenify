@@ -6,8 +6,18 @@ Item {
     width: lView.width
     height: 70
 
+    property bool isBeingDeleted: false
+
     Behavior on height {
         NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
+    }
+
+    Behavior on x {
+        NumberAnimation { duration: 300; easing.type: Easing.OutQuad }
+    }
+
+    Behavior on opacity {
+        NumberAnimation { duration: 300 }
     }
 
     Rectangle {
@@ -22,6 +32,7 @@ Item {
         color: root.bgColor
 
         property bool isOpened: false
+        property bool isContentVisible: false
 
         Behavior on height {
             NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
@@ -30,6 +41,7 @@ Item {
         MouseArea {
             anchors.fill: parent
             hoverEnabled: true
+            enabled: !rootItem.isBeingDeleted
 
             onEntered: {
                 gradientBackground.fadeDirection = "in";
@@ -43,8 +55,47 @@ Item {
 
             onClicked: {
                 rec.isOpened = !rec.isOpened;
-                rec.height = rec.isOpened ? 120 : 60;
-                rootItem.height = rec.isOpened ? 130 : 70;
+
+                contentTimer.stop();
+                collapseTimer.stop();
+
+                if (rec.isOpened) {
+                    rec.height = 120;
+                    rootItem.height = 130;
+                    contentTimer.start();
+                } else {
+                    rec.isContentVisible = false;
+                    collapseTimer.start();
+                }
+            }
+
+            Timer {
+                id: safetyTimer
+                interval: 250
+                repeat: false
+                running: rec.isOpened !== rec.isContentVisible
+                onTriggered: {
+                    rec.isContentVisible = rec.isOpened;
+                }
+            }
+        }
+
+        Timer {
+            id: contentTimer
+            interval: 200
+            repeat: false
+            onTriggered: {
+                rec.isContentVisible = true;
+            }
+        }
+
+        Timer {
+            id: collapseTimer
+            interval: 150
+            repeat: false
+            onTriggered: {
+                rec.height = 60;
+                rootItem.height = 70;
             }
         }
 
@@ -109,7 +160,11 @@ Item {
                     wrapMode: Text.Wrap
                     color: root.textColor
                     font.pointSize: 8
-                    opacity: 0
+                    opacity: rec.isContentVisible ? 1 : 0
+
+                    Behavior on opacity {
+                        NumberAnimation { duration: 150 }
+                    }
                 }
                 Item {
                     y: 74
@@ -122,12 +177,32 @@ Item {
                             height: 33
                             color: "red"
                             radius: 20
-                            opacity: 0
+                            opacity: rec.isContentVisible ? 1 : 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: 150 }
+                            }
 
                             MouseArea {
                                 anchors.fill: parent
                                 onClicked: {
-                                    lModel.remove(model.id)
+                                    // Start delete animation
+                                    rootItem.isBeingDeleted = true;
+
+                                    // Store the current index for the deletion
+                                    var currentIndex = -1;
+                                    for(let i = 0; i < lModel.count; ++i){
+                                        if(lModel.get(i).id === model.id){
+                                            currentIndex = i;
+                                            break;
+                                        }
+                                    }
+
+                                    if(currentIndex !== -1) {
+                                        // Schedule the deletion after animations
+                                        deleteTimer.modelIndex = currentIndex;
+                                        deleteTimer.start();
+                                    }
                                 }
                             }
                             Image {
@@ -137,7 +212,6 @@ Item {
                                 anchors.centerIn: parent
                                 smooth: true
                             }
-
                         }
                         Rectangle {
                             id: editTask
@@ -145,7 +219,19 @@ Item {
                             height: 33
                             color: "yellow"
                             radius: 20
-                            opacity: 0
+                            opacity: rec.isContentVisible ? 1 : 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: 150 }
+                            }
+
+                            Image {
+                                source: "qrc:/qt/qml/Serenify/Images/placeholder.webp" // Make sure this resource exists
+                                width: editTask.width * 0.8
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+                                smooth: true
+                            }
                         }
                         Rectangle {
                             id: finishTask
@@ -153,7 +239,19 @@ Item {
                             height: 33
                             color: "green"
                             radius: 20
-                            opacity: 0
+                            opacity: rec.isContentVisible ? 1 : 0
+
+                            Behavior on opacity {
+                                NumberAnimation { duration: 150 }
+                            }
+
+                            Image {
+                                source: "qrc:/qt/qml/Serenify/Images/placeholder.webp" // Make sure this resource exists
+                                width: finishTask.width * 0.8
+                                fillMode: Image.PreserveAspectFit
+                                anchors.centerIn: parent
+                                smooth: true
+                            }
                         }
                     }
                 }
@@ -175,41 +273,28 @@ Item {
                 }
             }
         }
+    }
 
-        states: [
-            State {
-                name: "collapsed"
-                PropertyChanges { target: descriptionLbl; opacity: 0 }
-                PropertyChanges { target: trashTask; opacity: 0 }
-                PropertyChanges { target: editTask; opacity: 0 }
-                PropertyChanges { target: finishTask; opacity: 0 }
-            },
-            State {
-                name: "expanded"
-                PropertyChanges { target: descriptionLbl; opacity: 1 }
-                PropertyChanges { target: trashTask; opacity: 1 }
-                PropertyChanges { target: editTask; opacity: 1 }
-                PropertyChanges { target: finishTask; opacity: 1 }
+    // Handle the deletion animation
+    states: [
+        State {
+            name: "deleting"
+            when: rootItem.isBeingDeleted
+            PropertyChanges { target: rootItem; x: rootItem.width }
+            PropertyChanges { target: rootItem; opacity: 0 }
+        }
+    ]
+
+    // Timer to actually remove the item after animation
+    Timer {
+        id: deleteTimer
+        interval: 300 // Match the duration of the delete animation
+        repeat: false
+        property int modelIndex: -1
+        onTriggered: {
+            if(modelIndex !== -1) {
+                lModel.remove(modelIndex);
             }
-        ]
-
-        transitions: [
-            Transition {
-                from: "collapsed"
-                to: "expanded"
-                reversible: true
-                ParallelAnimation {
-                    NumberAnimation { target: descriptionLbl; property: "opacity"; duration: 100 }
-                    NumberAnimation { target: trashTask; property: "opacity"; duration: 100 }
-                    NumberAnimation { target: editTask; property: "opacity"; duration: 100 }
-                    NumberAnimation { target: finishTask; property: "opacity"; duration: 100 }
-
-                }
-            }
-        ]
-
-        onIsOpenedChanged: {
-            rec.state = rec.isOpened ? "expanded" : "collapsed";
         }
     }
 }
