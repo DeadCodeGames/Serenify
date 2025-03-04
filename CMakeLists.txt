@@ -21,10 +21,12 @@
             QML_FILES TrashButton.qml
             RESOURCES resources.qrc
             RESOURCES Images/Trash.png
-            RESOURCES Images/placeholder.webp
+            RESOURCES Images/checkmark.png
+            RESOURCES Images/pencil.png
             QML_FILES Task.qml
             QML_FILES
             QML_FILES TimeDateSelector.qml
+            QML_FILES TaskCreator.qml
     )
 
     qt_add_resources(appSerenify}_resources

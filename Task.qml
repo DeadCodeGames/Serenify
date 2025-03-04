@@ -221,13 +221,27 @@ Item {
                             radius: 20
                             opacity: rec.isContentVisible ? 1 : 0
 
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    taskPopup.startName = model.name
+                                    taskPopup.startDesc = model.description
+                                    taskPopup.startPriority = model.priority
+                                    taskPopup.currentId = model.id
+                                    taskPopup.isEditing = true
+                                    dateTimeSelector.selectedDate = model.deadline
+                                    taskPopup.open()
+
+                                }
+                            }
+
                             Behavior on opacity {
                                 NumberAnimation { duration: 150 }
                             }
 
                             Image {
-                                source: "qrc:/qt/qml/Serenify/Images/placeholder.webp" // Make sure this resource exists
-                                width: editTask.width * 0.8
+                                source: "qrc:/qt/qml/Serenify/Images/pencil.png"
+                                width: editTask.width * 0.6
                                 fillMode: Image.PreserveAspectFit
                                 anchors.centerIn: parent
                                 smooth: true
@@ -246,8 +260,8 @@ Item {
                             }
 
                             Image {
-                                source: "qrc:/qt/qml/Serenify/Images/placeholder.webp" // Make sure this resource exists
-                                width: finishTask.width * 0.8
+                                source: "qrc:/qt/qml/Serenify/Images/checkmark.png"
+                                width: finishTask.width * 0.6
                                 fillMode: Image.PreserveAspectFit
                                 anchors.centerIn: parent
                                 smooth: true
@@ -262,9 +276,9 @@ Item {
                 Rectangle {
                     id: priorityRec
                     function assignColor(){
-                        if (model.priority == "Low") return "green";
-                        if (model.priority == "Medium") return "yellow";
-                        if (model.priority == "High") return "red";
+                        if (model.priority === "Low") return "green";
+                        if (model.priority === "Medium") return "yellow";
+                        if (model.priority === "High") return "red";
                     }
                     color: assignColor()
                     width: 12
