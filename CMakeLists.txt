@@ -27,6 +27,7 @@
             QML_FILES
             QML_FILES TimeDateSelector.qml
             QML_FILES TaskCreator.qml
+            SOURCES
     )
 
     qt_add_resources(appSerenify}_resources

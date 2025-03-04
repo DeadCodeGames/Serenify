@@ -54,19 +54,41 @@ Item {
             }
 
             onClicked: {
-                rec.isOpened = !rec.isOpened;
+                if(root.isDeleting && !isBeingDeleted){
+                    // Start delete animation
+                    rootItem.isBeingDeleted = true;
 
-                contentTimer.stop();
-                collapseTimer.stop();
+                    // Store the current index for the deletion
+                    var currentIndex = -1;
+                    for(let i = 0; i < lModel.count; ++i){
+                        if(lModel.get(i).id === model.id){
+                            currentIndex = i;
+                            break;
+                        }
+                    }
 
-                if (rec.isOpened) {
-                    rec.height = 120;
-                    rootItem.height = 130;
-                    contentTimer.start();
-                } else {
-                    rec.isContentVisible = false;
-                    collapseTimer.start();
+                    if(currentIndex !== -1) {
+                        // Schedule the deletion after animations
+                        deleteTimer.modelIndex = currentIndex;
+                        deleteTimer.start();
+                    }
                 }
+                else{
+                    rec.isOpened = !rec.isOpened;
+
+                    contentTimer.stop();
+                    collapseTimer.stop();
+
+                    if (rec.isOpened) {
+                        rec.height = 120;
+                        rootItem.height = 130;
+                        contentTimer.start();
+                    } else {
+                        rec.isContentVisible = false;
+                        collapseTimer.start();
+                    }
+                }
+
             }
 
             Timer {
@@ -308,6 +330,7 @@ Item {
         onTriggered: {
             if(modelIndex !== -1) {
                 lModel.remove(modelIndex);
+                rootItem.isBeingDeleted = false;
             }
         }
     }

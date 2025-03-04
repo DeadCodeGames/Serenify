@@ -15,6 +15,9 @@ Window {
 
     // Variables
     property int taskCounter: 0
+    property date currentDate: new Date()
+    property string stringDate: ""
+    property bool isDeleting: false
 
     // Colors here
     property bool mode: true // False = dark mode, True = light mode
@@ -32,6 +35,29 @@ Window {
     property color inputBorderValid: mode ? "#55aa55" : "#33aa33"
 
     color: bgColor
+
+    Timer {
+        id: isTaskDue
+        interval: 60000
+        repeat: true
+        running: true
+        onTriggered: {
+            currentDate = new Date();
+            stringDate = formatDateTime();
+            console.log(stringDate)
+            // Finish when sorting functions are created
+        }
+    }
+
+    function formatDateTime() {
+        let day = String(currentDate.getDate()).padStart(2, '0');
+        let month = String(currentDate.getMonth() + 1).padStart(2, '0');
+        let year = String(currentDate.getFullYear());
+        let hours = String(currentDate.getHours()).padStart(2, '0');
+        let minutes = String(currentDate.getMinutes()).padStart(2, '0');
+
+        return day + "-" + month + "-" + year + " " + hours + ":" + minutes;
+    }
 
     ListModel {
         id: lModel
@@ -124,7 +150,7 @@ Window {
             radius: 25
             col: root.trashColor
             onClicked: {
-                if(lModel.count > 0) lModel.remove(lModel.count-1)
+                root.isDeleting = !root.isDeleting
             }
         }
     }

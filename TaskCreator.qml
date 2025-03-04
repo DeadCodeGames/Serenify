@@ -32,6 +32,10 @@ Popup {
         }
     }
 
+    onClosed: {
+        isEditing = false
+    }
+
     background: Rectangle {
         id: popupBackground
         color: root.bgColor
@@ -352,7 +356,6 @@ Popup {
                             }
                         }
                     }
-
                     taskPopup.close();
                 }
             }
