@@ -337,8 +337,9 @@ Popup {
                             deadline: dateTimeSelector.selectedDate,
                             description: taskDescription.text,
                             priority: taskPriority.currentText,
-                            id: root.taskCounter++
+                            id: root.taskCounter++             
                         });
+                        taskManager.insertToTable(root.taskCounter, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText)
 
                         taskName.text = ""
                         taskDescription.text = ""

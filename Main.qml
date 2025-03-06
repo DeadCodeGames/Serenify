@@ -1,4 +1,4 @@
-import QtQuick
+import QtQuick 2.15
 import QtQuick.Controls.Basic 2.15
 import QtQuick.Layouts
 
@@ -44,7 +44,7 @@ Window {
         onTriggered: {
             currentDate = new Date();
             stringDate = formatDateTime();
-            console.log(stringDate)
+            console.log(currentDate)
             // Finish when sorting functions are created
         }
     }
@@ -181,5 +181,30 @@ Window {
         taskPopup.taskNameError.text = !isValidName ?
             (taskPopup.taskName.text.length === 0 ? "Task name is required" : "Maximum 30 characters allowed") : ""
         taskPopup.dateError.text = !isValidDate ? "Deadline is required" : ""
+    }
+
+    function appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance) {
+        console.log("Appending task to model:", id, taskName, taskDeadline, taskDescription, taskImportance);
+        if(id < lModel.count) lModel.count = id;
+        lModel.append({
+            id: id,
+            name: taskName,
+            deadline: taskDeadline,
+            description: taskDescription,
+            priority: taskImportance
+        });
+    }
+
+    Connections {
+        target: taskManager
+        function onTaskLoaded(id, taskName, taskDeadline, taskDescription, taskImportance) {
+            appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance)
+        }
+    }
+
+
+    Component.onCompleted: {
+        console.log("Loading from database...");
+        taskManager.loadTasksDB();
     }
 }

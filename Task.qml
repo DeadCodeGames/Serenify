@@ -71,6 +71,7 @@ Item {
                         // Schedule the deletion after animations
                         deleteTimer.modelIndex = currentIndex;
                         deleteTimer.start();
+                        taskManager.removeTaskDB(currentIndex);
                     }
                 }
                 else{
@@ -224,6 +225,7 @@ Item {
                                         // Schedule the deletion after animations
                                         deleteTimer.modelIndex = currentIndex;
                                         deleteTimer.start();
+                                        taskManager.removeTaskDB(currentIndex);
                                     }
                                 }
                             }
@@ -253,7 +255,6 @@ Item {
                                     taskPopup.isEditing = true
                                     dateTimeSelector.selectedDate = model.deadline
                                     taskPopup.open()
-
                                 }
                             }
 
