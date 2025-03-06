@@ -357,6 +357,7 @@ Popup {
                         }
                     }
                     taskPopup.close();
+                    root.sortTasks();
                 }
             }
         }
