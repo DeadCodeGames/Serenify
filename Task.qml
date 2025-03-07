@@ -25,7 +25,7 @@ Item {
         width: parent.width - 20
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
-        border.color: root.borderColor
+        border.color: root.isDeleting ? root.trashDeletingColor : root.borderColor
         border.width: 2
         radius: 10
         height: 60
@@ -33,6 +33,7 @@ Item {
 
         property bool isOpened: false
         property bool isContentVisible: false
+        property int expandedHeight: Math.max(120, 60 + descriptionLbl.height + buttonRow.height + 20) // Dynamic height based on content
 
         Behavior on height {
             NumberAnimation { duration: 200; easing.type: Easing.InOutQuad }
@@ -42,7 +43,7 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             enabled: !rootItem.isBeingDeleted
-
+            cursorShape: root.isDeleting ? Qt.PointingHandCursor : Qt.ArrowCursor
             onEntered: {
                 gradientBackground.fadeDirection = "in";
                 fadeTimer.start();
@@ -80,15 +81,14 @@ Item {
                     collapseTimer.stop();
 
                     if (rec.isOpened) {
-                        rec.height = 120;
-                        rootItem.height = 130;
+                        rec.height = rec.expandedHeight;
+                        rootItem.height = rec.expandedHeight + 10;
                         contentTimer.start();
                     } else {
                         rec.isContentVisible = false;
                         collapseTimer.start();
                     }
                 }
-
             }
 
             Timer {
@@ -149,7 +149,7 @@ Item {
             gradient: Gradient {
                 GradientStop { position: 0.0; color: root.bgColor }
                 GradientStop { position: 0.5; color: root.bgColor }
-                GradientStop { position: 1.0; color: root.borderColor }
+                GradientStop { position: 1.0; color: root.isDeleting ? root.trashDeletingColor : root.borderColor }
             }
         }
 
@@ -184,12 +184,31 @@ Item {
                     font.pointSize: 8
                     opacity: rec.isContentVisible ? 1 : 0
 
+                    // Update the rectangle's expanded height whenever the text changes
+                    onTextChanged: {
+                        // Force layout update to get correct height
+                        descriptionLbl.height = implicitHeight;
+                        rec.expandedHeight = Math.max(120, 60 + descriptionLbl.height + buttonRow.height + 20);
+
+                        // If already expanded, update heights immediately
+                        if (rec.isOpened) {
+                            rec.height = rec.expandedHeight;
+                            rootItem.height = rec.expandedHeight + 10;
+                        }
+                    }
+
+                    // Also update on component completion
+                    Component.onCompleted: {
+                        descriptionLbl.height = implicitHeight;
+                        rec.expandedHeight = Math.max(120, 60 + descriptionLbl.height + buttonRow.height + 20);
+                    }
+
                     Behavior on opacity {
                         NumberAnimation { duration: 150 }
                     }
                 }
                 Item {
-                    y: 74
+                    y: rec.expandedHeight - 49
                     Row{
                         id: buttonRow
                         spacing: 10

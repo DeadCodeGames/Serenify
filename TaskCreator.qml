@@ -128,7 +128,7 @@ Popup {
                 color: root.textColor
                 placeholderTextColor: root.phTextColor
                 onTextChanged: root.validateInput()
-                maximumLength: 100
+                maximumLength: 500
 
                 background: Rectangle {
                     color: mode ? "#f5f5f5" : "#252525"
@@ -140,7 +140,7 @@ Popup {
 
             Text {
                 id: charCounter
-                text: taskDescription.text.length + "/100"
+                text: taskDescription.text.length + "/500"
                 color: root.textColor
                 opacity: 0.7
                 font.pixelSize: 12
@@ -241,7 +241,22 @@ Popup {
                     font.pixelSize: 14
                     verticalAlignment: Text.AlignVCenter
                 }
+                delegate: ItemDelegate {
+                    width: taskPriority.width
+                    contentItem: Text {
+                        text: modelData
+                        color: root.textColor
+                        font.pixelSize: 14
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    highlighted: taskPriority.highlightedIndex === index
 
+                    // Custom background for highlighted state
+                    background: Rectangle {
+                        color: highlighted ? (mode ? "#d0d0d0" : "#404040") : "transparent"
+                    }
+                }
                 popup: Popup {
                     y: taskPriority.height
                     width: taskPriority.width
@@ -255,7 +270,6 @@ Popup {
 
                         currentIndex: taskPriority.highlightedIndex
 
-                        ScrollIndicator.vertical: ScrollIndicator { }
                     }
 
                     background: Rectangle {

@@ -20,6 +20,7 @@ Window {
     // Colors here
     property bool mode: true // False = dark mode, True = light mode
     property color trashColor: mode ? "red" : "#850900"
+    property color trashDeletingColor: mode ? "#ff6a00" : "#ab4700"
     property color plusColor: mode ? "blue" : "#03076b"
     property color borderColor: mode ? "#ff9991" : "red"
     property color bgColor: mode ? "white" : "#171716"
@@ -135,7 +136,7 @@ Window {
 
         TrashButton {
             radius: 25
-            col: root.trashColor
+            col: root.isDeleting ? root.trashDeletingColor : root.trashColor
             onClicked: {
                 root.isDeleting = !root.isDeleting
             }
@@ -160,7 +161,7 @@ Window {
 
     function validateInput() {
         let isValidName = taskPopup.taskName.text.length > 0 && taskPopup.taskName.text.length <= 30
-        let isValidDesc = taskPopup.taskDescription.text.length <= 100
+        let isValidDesc = taskPopup.taskDescription.text.length <= 500
         let isValidDate = dateTimeSelector.selectedDate !== ""
 
         taskPopup.addButton.enabled = isValidName && isValidDesc && isValidDate

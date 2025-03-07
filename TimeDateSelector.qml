@@ -430,6 +430,7 @@ Popup {
 
         Text {
             text: "Pick a deadline date"
+            color: root.textColor
             font.pixelSize: 24
             Layout.alignment: Qt.AlignHCenter
         }
@@ -444,6 +445,7 @@ Popup {
                 Tumbler {
                     id: yearTumbler
                     model: []
+                    palette.text: root.textColor
                     onCurrentIndexChanged: {
                         if (!ignoreChanges) {
                             updateMonthModel();
@@ -459,6 +461,7 @@ Popup {
                 Tumbler {
                     id: monthTumbler
                     model: []
+                    palette.text: root.textColor
                     onCurrentIndexChanged: {
                         if (!ignoreChanges) {
                             updateDayModel();
@@ -473,6 +476,7 @@ Popup {
                 Tumbler {
                     id: dayTumbler
                     model: []
+                    palette.text: root.textColor
                     onCurrentIndexChanged: {
                         if (!ignoreChanges) {
                             updateHourModel();
@@ -490,6 +494,7 @@ Popup {
                 Tumbler {
                     id: hourTumbler
                     model: []
+                    palette.text: root.textColor
                     onCurrentIndexChanged: {
                         if (!ignoreChanges) {
                             updateMinuteModel();
@@ -502,6 +507,7 @@ Popup {
                 Tumbler {
                     id: minuteTumbler
                     model: []
+                    palette.text: root.textColor
                     onCurrentIndexChanged: {
                         if (!ignoreChanges) {
                             updateDateFromTumblers();
@@ -512,13 +518,46 @@ Popup {
             }
 
             RowLayout {
-                spacing: 20
+                spacing: 10
                 Button {
-                    text: "Cancel"
+                    id: cancelBtn
+                    Layout.preferredWidth: 133
+                    implicitHeight: 40
+                    background: Rectangle {
+                        color: mode ? "#e0e0e0" : "#303030"
+                        radius: 6
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Cancel"
+                            color: root.textColor
+                        }
+
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 6
+                            color: cancelBtn.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
+                        }
+                    }
                     onClicked: dateTimePicker.close()
                 }
                 Button {
-                    text: "OK"
+                    id: okBtn
+                    Layout.preferredWidth: 133
+                    implicitHeight: 40
+                    background: Rectangle {
+                        color: mode ? "#e0e0e0" : "#303030"
+                        radius: 6
+                        Text {
+                            anchors.centerIn: parent
+                            text: "Ok"
+                            color: root.textColor
+                        }
+                        Rectangle {
+                            anchors.fill: parent
+                            radius: 6
+                            color: okBtn.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
+                        }
+                    }
                     onClicked: {
                         dateTimePicker.selectedDate = dateTimePicker.formatDateTime();
                         dateTimePicker.close();

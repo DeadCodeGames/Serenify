@@ -13,7 +13,6 @@ Item {
         property color _btnColor: "red"
         id: buttonTrash
         anchors.fill: parent
-        color: _btnColor
         state: "normal"
 
         Image {
