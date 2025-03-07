@@ -153,6 +153,7 @@ Window {
                 root.isDeleting = !root.isDeleting
             }
         }
+
     }
 
     TaskCreator {
@@ -162,6 +163,7 @@ Window {
         anchors.centerIn: parent
         closePolicy: Popup.CloseOnEscape | Popup.CloseOnPressOutside
     }
+
 
     TimeDateSelector {
         id: dateTimeSelector
@@ -183,28 +185,98 @@ Window {
         taskPopup.dateError.text = !isValidDate ? "Deadline is required" : ""
     }
 
+    function sortTasks() {
+        if(lModel.count<2) return;
+        let tasks = [];
+        for (let i = 0; i < lModel.count; i++) {
+            let task = lModel.get(i);
+            tasks.push({
+                priority: task.priority,
+                deadline: task.deadline,
+                name: task.name,
+                description: task.description,
+                id: task.id
+            });
+        }
+
+        const priorityValue = {
+            "High": 0,
+            "Medium": 1,
+            "Low": 2
+        };
+
+        tasks.sort(function(a, b) {
+            const priorityDiff = priorityValue[a.priority] - priorityValue[b.priority];
+            if (priorityDiff !== 0) return priorityDiff;
+            const dateA = parseDeadline(a.deadline);
+            const dateB = parseDeadline(b.deadline);
+            return dateA - dateB;
+        });
+        lModel.clear();
+        for (let j = 0; j < tasks.length; j++) {
+            lModel.append({
+                priority: tasks[j].priority,
+                deadline: tasks[j].deadline,
+                name: tasks[j].name,
+                description: tasks[j].description,
+                id: tasks[j].id
+            });
+        }
+    }
+
+    function parseDeadline(deadlineStr) {
+        const parts = deadlineStr.split(" ");
+        const dateParts = parts[0].split("-");
+        const timeParts = parts[1].split(":");
+
+        const day = parseInt(dateParts[0], 10);
+        const month = parseInt(dateParts[1], 10) - 1;
+        const year = parseInt(dateParts[2], 10);
+        const hours = parseInt(timeParts[0], 10);
+        const minutes = parseInt(timeParts[1], 10);
+
+        return new Date(year, month, day, hours, minutes);
+    }
+
     function appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance) {
         console.log("Appending task to model:", id, taskName, taskDeadline, taskDescription, taskImportance);
-        if(id < lModel.count) lModel.count = id;
+        if(id >= root.taskCounter) root.taskCounter = id+1
         lModel.append({
-            id: id,
             name: taskName,
-            deadline: taskDeadline,
             description: taskDescription,
-            priority: taskImportance
+            deadline: taskDeadline,
+            priority: taskImportance,
+            id: id
         });
+    }
+
+    Component.onCompleted: {
+        console.log("Component completed, delaying database load...");
+        loadTimer.start();
     }
 
     Connections {
         target: taskManager
         function onTaskLoaded(id, taskName, taskDeadline, taskDescription, taskImportance) {
-            appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance)
+            console.log("Task loaded signal received:", id, taskName);
+
+            // Ensure the model exists
+            if (lModel) {
+                appendTaskToModel(id, taskName, taskDescription, taskDeadline, taskImportance);
+            } else {
+                console.error("ListModel not available when trying to append task");
+            }
         }
     }
 
-
-    Component.onCompleted: {
-        console.log("Loading from database...");
-        taskManager.loadTasksDB();
+    Timer {
+        id: loadTimer
+        interval: 100 // Short delay to ensure everything is initialized
+        repeat: false
+        running: false
+        onTriggered: {
+            console.log("Loading from database...");
+            taskManager.loadTasksDB();
+        }
     }
 }

@@ -46,7 +46,7 @@ int main(int argc, char *argv[]) {
         "id INTEGER PRIMARY KEY, "
         "taskName TEXT NOT NULL, "
         "taskDescription TEXT,"
-        "dateDeadline DATE NOT NULL,"
+        "taskDeadline DATE NOT NULL,"
         "taskImportance TEXT NOT NULL)";
 
     if (sqlite3_exec(db, createTableSQL, nullptr, 0, &errorMessage) != SQLITE_OK) {
@@ -74,8 +74,8 @@ int main(int argc, char *argv[]) {
         qDebug() << "No tasks found. Adding example task...";
 
         const char* insertSQL =
-            "INSERT INTO tasks (taskName, taskDescription, dateDeadline, taskImportance) "
-            "VALUES ('Example Task', 'This is a sample task.', '2025-12-31', 'High');";
+            "INSERT INTO tasks (id, taskName, taskDescription, taskDeadline, taskImportance) "
+            "VALUES ('1', 'Example Task', 'This is a sample task.', '2025-12-31 00:00:00', 'high');";
 
         if (sqlite3_exec(db, insertSQL, nullptr, 0, &errorMessage) != SQLITE_OK) {
             qDebug() << "Error inserting example task: " << errorMessage;
@@ -106,12 +106,19 @@ int main(int argc, char *argv[]) {
         QObject *rootObject = engine.rootObjects().first();
         if (rootObject) {
             // Now invoke the method on the root object
+            /*QMetaObject::invokeMethod(rootObject, "appendTaskToModel",
+                                      Q_ARG(QVariant, QVariant::fromValue(id)),
+                                      Q_ARG(QVariant, QVariant::fromValue(taskName)),
+                                      Q_ARG(QVariant, QVariant::fromValue(taskDescription)),
+                                      Q_ARG(QVariant, QVariant::fromValue(taskDeadline)),
+                                      Q_ARG(QVariant, QVariant::fromValue(taskImportance)));*/
+
             QMetaObject::invokeMethod(rootObject, "appendTaskToModel",
-                                      Q_ARG(int, id),
-                                      Q_ARG(QString, taskName),
-                                      Q_ARG(QString, taskDeadline),
-                                      Q_ARG(QString, taskDescription),
-                                      Q_ARG(QString, taskImportance));
+                                    Q_ARG(int, id),
+                                    Q_ARG(QString, taskName),
+                                    Q_ARG(QString, taskDescription),
+                                    Q_ARG(QString, taskDeadline),
+                                    Q_ARG(QString, taskImportance));
         } else {
             qWarning() << "Root object is null!";
         }

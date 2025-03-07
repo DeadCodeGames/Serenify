@@ -2,10 +2,13 @@ import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls 2.15
 
+
 Popup {
     id: taskPopup
     width: 340
     height: 520
+
+    signal updateTask(int id, string name, string description, string deadline, string priority)
 
     property alias taskName: taskName
     property alias taskDescription: taskDescription
@@ -334,8 +337,8 @@ Popup {
                     if(!isEditing){
                         lModel.append({
                             name: taskName.text,
-                            deadline: dateTimeSelector.selectedDate,
                             description: taskDescription.text,
+                            deadline: dateTimeSelector.selectedDate,
                             priority: taskPriority.currentText,
                             id: root.taskCounter++             
                         });
@@ -350,14 +353,16 @@ Popup {
                         for(let i = 0; i < lModel.count; ++i){
                             if(lModel.get(i).id === taskPopup.currentId){
                                 lModel.get(i).name = taskName.text
-                                lModel.get(i).deadline = dateTimeSelector.selectedDate
                                 lModel.get(i).description = taskDescription.text
+                                lModel.get(i).deadline = dateTimeSelector.selectedDate
                                 lModel.get(i).priority = taskPriority.currentText
+                                taskManager.updateTaskDB(taskPopup.currentId, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText);
                                 break;
                             }
                         }
                     }
                     taskPopup.close();
+                    root.sortTasks();
                 }
             }
         }

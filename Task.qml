@@ -71,7 +71,7 @@ Item {
                         // Schedule the deletion after animations
                         deleteTimer.modelIndex = currentIndex;
                         deleteTimer.start();
-                        taskManager.removeTaskDB(currentIndex);
+                        taskManager.removeTaskDB(model.id);
                     }
                 }
                 else{
@@ -225,7 +225,7 @@ Item {
                                         // Schedule the deletion after animations
                                         deleteTimer.modelIndex = currentIndex;
                                         deleteTimer.start();
-                                        taskManager.removeTaskDB(currentIndex);
+                                        taskManager.removeTaskDB(model.id);
                                     }
                                 }
                             }

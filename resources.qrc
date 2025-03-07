@@ -1,5 +1,8 @@
 <RCC>
     <qresource prefix="/qt/qml/Serenify/Images">
         <file>Images/Trash.png</file>
+        <file>Images/checkmark.png</file>
+        <file>Images/pencil.png</file>
+        <file>Images/placeholder.webp</file>
     </qresource>
 </RCC>
