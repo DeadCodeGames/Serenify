@@ -15,8 +15,6 @@ Window {
 
     // Variables
     property int taskCounter: 0
-    property date currentDate: new Date()
-    property string stringDate: ""
     property bool isDeleting: false
 
     // Colors here
@@ -36,18 +34,7 @@ Window {
 
     color: bgColor
 
-    Timer {
-        id: isTaskDue
-        interval: 60000
-        repeat: true
-        running: true
-        onTriggered: {
-            currentDate = new Date();
-            stringDate = formatDateTime();
-            console.log(stringDate)
-            // Finish when sorting functions are created
-        }
-    }
+
 
     function formatDateTime() {
         let day = String(currentDate.getDate()).padStart(2, '0');
