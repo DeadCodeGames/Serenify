@@ -14,15 +14,15 @@ public:
     explicit TaskManager(QObject *parent = nullptr);
     ~TaskManager();
 
-    Q_INVOKABLE void insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString taskPriority);
+    Q_INVOKABLE void insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString taskPriority, int taskStateFinished);
     Q_INVOKABLE QList<QObject*> getTasks(); // Fetch tasks from the database
     Q_INVOKABLE bool removeTaskDB(int id);
     Q_INVOKABLE void loadTasksDB();
-    Q_INVOKABLE bool updateTaskDB(int taskId, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString &taskPriority);
+    Q_INVOKABLE bool updateTaskDB(int taskId, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString &taskPriority, int taskStateFinished);
     void cleanupBeforeExit();  // Function to run on exit
 
 signals:
-    void taskLoaded(int id, QString taskName, QString taskDescription, QString taskDeadline, QString taskImportance);
+    void taskLoaded(int id, QString taskName, QString taskDescription, QString taskDeadline, QString taskImportance, int taskStateFinished);
 
 
 private:

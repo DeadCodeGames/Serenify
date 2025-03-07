@@ -20,7 +20,7 @@ void TaskManager::loadTasksDB() {
         return;
     }
 
-    const char* sql = "SELECT id, taskName, taskDescription, taskDeadline, taskImportance FROM tasks;";
+    const char* sql = "SELECT id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished FROM tasks;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         qDebug() << "Error preparing statement: " << sqlite3_errmsg(db);
         sqlite3_close(db);
@@ -36,9 +36,10 @@ void TaskManager::loadTasksDB() {
         QString taskDescription = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
         QString taskDeadline = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
         QString taskImportance = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+        int taskStateFinished = sqlite3_column_int(stmt, 5);
 
-        qDebug() << "data is: " << id << taskName << taskDescription << taskDeadline << taskImportance;
-        emit taskLoaded(id, taskName, taskDescription, taskDeadline, taskImportance);
+        qDebug() << "data is: " << id << taskName << taskDescription << taskDeadline << taskImportance << taskStateFinished;
+        emit taskLoaded(id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished);
     }
 
     sqlite3_finalize(stmt);
@@ -121,7 +122,7 @@ void TaskManager::cleanupBeforeExit() {
     }
 }
 
-bool TaskManager::updateTaskDB(int id, const QString &name, const QString &description, const QString &deadline, const QString &priority) {
+bool TaskManager::updateTaskDB(int id, const QString &name, const QString &description, const QString &deadline, const QString &priority, int taskStateFinished) {
     sqlite3* db;
     sqlite3_stmt* stmt;
 
@@ -130,7 +131,7 @@ bool TaskManager::updateTaskDB(int id, const QString &name, const QString &descr
         return false;
     }
 
-    const char* sql = "UPDATE tasks SET taskName = ?, taskDescription = ?, taskDeadline = ?, taskImportance = ? WHERE id = ?;";
+    const char* sql = "UPDATE tasks SET taskName = ?, taskDescription = ?, taskDeadline = ?, taskImportance = ?, taskStateFinished = ? WHERE id = ?;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         qDebug() << "Error preparing update statement: " << sqlite3_errmsg(db);
         sqlite3_close(db);
@@ -141,7 +142,8 @@ bool TaskManager::updateTaskDB(int id, const QString &name, const QString &descr
     sqlite3_bind_text(stmt, 2, description.toUtf8().constData(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 3, deadline.toUtf8().constData(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_text(stmt, 4, priority.toUtf8().constData(), -1, SQLITE_TRANSIENT);
-    sqlite3_bind_int(stmt, 5, id);
+    sqlite3_bind_int(stmt, 5, taskStateFinished);
+    sqlite3_bind_int(stmt, 6, id);
 
     int result = sqlite3_step(stmt);
 
@@ -159,45 +161,6 @@ bool TaskManager::updateTaskDB(int id, const QString &name, const QString &descr
     return true;
 }
 
-
-/*void TaskManager::updateDB(int taskId, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString &taskPriority) {
-    sqlite3* db;
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_open("tasks.db", &db) != SQLITE_OK) {
-        qDebug() << "Error opening database: " << sqlite3_errmsg(db);
-        return;
-    }
-
-    const char* sql = "UPDATE tasks SET taskName = ?, taskDescription = ?, taskDeadline = ?, taskImportance = ? WHERE id = ?;";
-
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
-        qDebug() << "Error preparing statement: " << sqlite3_errmsg(db);
-        sqlite3_close(db);
-        return;
-    }
-
-    // Bind the values to the query
-    sqlite3_bind_text(stmt, 1, taskName.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 2, taskDescription.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, taskDeadline.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, taskPriority.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_int(stmt, 5, taskId);
-
-    // Execute the update statement
-    if (sqlite3_step(stmt) != SQLITE_DONE) {
-        qDebug() << "Error updating task: " << sqlite3_errmsg(db);
-    } else {
-        qDebug() << "Task successfully updated with ID:" << taskId;
-    }
-
-    // Finalize and close
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-}*/
-
-
-
 QList<QObject*> TaskManager::getTasks() {
     QList<QObject*> taskList;
     sqlite3* db;
@@ -208,7 +171,7 @@ QList<QObject*> TaskManager::getTasks() {
         return taskList;
     }
 
-    const char* sql = "SELECT id, taskName, taskDescription, taskDeadline, taskImportance FROM tasks;";
+    const char* sql = "SELECT id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished FROM tasks;";
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
         while (sqlite3_step(stmt) == SQLITE_ROW) {
 
@@ -218,8 +181,9 @@ QList<QObject*> TaskManager::getTasks() {
             QString taskDescription = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
             QString taskDeadline = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
             QString taskImportance = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
+            int taskStateFinished = sqlite3_column_int(stmt, 5);
 
-            Task* task = new Task(id, taskName, taskDescription, taskDeadline, taskImportance);
+            Task* task = new Task(id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished);
             taskList.append(task);
         }
     } else {
@@ -232,7 +196,7 @@ QList<QObject*> TaskManager::getTasks() {
     return taskList;
 }
 
-void TaskManager::insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString taskPriority) {
+void TaskManager::insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString taskPriority, int taskStateFinished) {
     sqlite3* db;
     sqlite3_stmt* stmt;
 
@@ -241,7 +205,7 @@ void TaskManager::insertToTable(int id, const QString &taskName, const QString &
         return;
     }
 
-    const char* sql = "INSERT INTO tasks (id, taskName, taskDescription, taskDeadline, taskImportance) VALUES (?, ?, ?, ?, ?);";
+    const char* sql = "INSERT INTO tasks (id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished) VALUES (?, ?, ?, ?, ?, ?);";
 
     if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) != SQLITE_OK) {
         qDebug() << "Error preparing statement: " << sqlite3_errmsg(db);
@@ -263,6 +227,7 @@ void TaskManager::insertToTable(int id, const QString &taskName, const QString &
     sqlite3_bind_text(stmt, 3, taskDescription.toStdString().c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 4, taskDeadline.toStdString().c_str(), -1, SQLITE_STATIC);
     sqlite3_bind_text(stmt, 5, taskPriority.toStdString().c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_int(stmt, 6, taskStateFinished);
 
     // Execute the statement
     if (sqlite3_step(stmt) != SQLITE_DONE) {

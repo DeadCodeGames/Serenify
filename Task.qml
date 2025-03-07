@@ -163,7 +163,6 @@ Item {
                 GradientStop { position: 0.0; color: root.bgColor }
                 GradientStop { position: 0.5; color: root.bgColor }
                 GradientStop { position: 1.0; color: gradientBackground.hoverColor }
-
             }
         }
 
@@ -331,6 +330,7 @@ Item {
                                         model.finished = 1;
                                     }
                                     else model.finished = 0;
+                                    taskManager.updateTaskDB(model.id, model.name, model.description, model. deadline, model.priority, model.finished)
                                     root.sortTasks();
                                 }
                             }
@@ -359,6 +359,7 @@ Item {
                         if (model.priority === "Low") return "green";
                         if (model.priority === "Medium") return "yellow";
                         if (model.priority === "High") return "red";
+                        else return "green";
                     }
                     color: assignColor()
                     width: 12
