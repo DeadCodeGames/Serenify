@@ -51,11 +51,10 @@ Popup {
         id: headerRect
         width: parent.width
         height: 60
-        color: mode ? "#f0f0f0" : "#252525"
-        radius: 15
+        color: root.bgColor
 
         Text {
-            text: "Create a New Task"
+            text: "Create a new task"
             color: root.textColor
             font.pixelSize: 22
             font.weight: Font.Medium
@@ -131,7 +130,7 @@ Popup {
                 color: root.textColor
                 placeholderTextColor: root.phTextColor
                 onTextChanged: root.validateInput()
-                maximumLength: 100
+                maximumLength: 500
 
                 background: Rectangle {
                     color: mode ? "#f5f5f5" : "#252525"
@@ -143,7 +142,7 @@ Popup {
 
             Text {
                 id: charCounter
-                text: taskDescription.text.length + "/100"
+                text: taskDescription.text.length + "/500"
                 color: root.textColor
                 opacity: 0.7
                 font.pixelSize: 12
@@ -244,7 +243,22 @@ Popup {
                     font.pixelSize: 14
                     verticalAlignment: Text.AlignVCenter
                 }
+                delegate: ItemDelegate {
+                    width: taskPriority.width
+                    contentItem: Text {
+                        text: modelData
+                        color: root.textColor
+                        font.pixelSize: 14
+                        elide: Text.ElideRight
+                        verticalAlignment: Text.AlignVCenter
+                    }
+                    highlighted: taskPriority.highlightedIndex === index
 
+                    // Custom background for highlighted state
+                    background: Rectangle {
+                        color: highlighted ? (mode ? "#d0d0d0" : "#404040") : "transparent"
+                    }
+                }
                 popup: Popup {
                     y: taskPriority.height
                     width: taskPriority.width
@@ -255,10 +269,7 @@ Popup {
                         clip: true
                         implicitHeight: contentHeight
                         model: taskPriority.popup.visible ? taskPriority.delegateModel : null
-
                         currentIndex: taskPriority.highlightedIndex
-
-                        ScrollIndicator.vertical: ScrollIndicator { }
                     }
 
                     background: Rectangle {
@@ -283,16 +294,20 @@ Popup {
                 id: cancelButton
                 Layout.preferredWidth: 133
                 implicitHeight: 40
-                text: "Cancel"
 
                 background: Rectangle {
                     color: mode ? "#e0e0e0" : "#303030"
                     radius: 6
 
-                    Rectangle {
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Cancel"
+                        color: root.textColor
+                    }
+
+                    MouseArea{
                         anchors.fill: parent
-                        radius: 6
-                        color: cancelButton.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
 
@@ -318,10 +333,13 @@ Popup {
                 Layout.preferredWidth: 133
                 implicitHeight: 40
                 enabled: taskName.text.length > 0 && dateTimeSelector.selectedDate !== ""
-
                 background: Rectangle {
                     color: addButton.enabled ? (addButton.pressed ? root.greenBtnHover : root.greenBtn) : root.greenBtnDisabled
                     radius: 6
+                    MouseArea{
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                    }
                 }
 
                 contentItem: Text {
@@ -340,9 +358,10 @@ Popup {
                             description: taskDescription.text,
                             deadline: dateTimeSelector.selectedDate,
                             priority: taskPriority.currentText,
-                            id: root.taskCounter++             
+                            id: root.taskCounter++,
+                            finished: 0
                         });
-                        taskManager.insertToTable(root.taskCounter, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText)
+                        taskManager.insertToTable(root.taskCounter, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText, 0)
 
                         taskName.text = ""
                         taskDescription.text = ""
@@ -356,7 +375,7 @@ Popup {
                                 lModel.get(i).description = taskDescription.text
                                 lModel.get(i).deadline = dateTimeSelector.selectedDate
                                 lModel.get(i).priority = taskPriority.currentText
-                                taskManager.updateTaskDB(taskPopup.currentId, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText);
+                                taskManager.updateTaskDB(taskPopup.currentId, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText, finished);
                                 break;
                             }
                         }

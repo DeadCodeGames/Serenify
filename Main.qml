@@ -15,13 +15,12 @@ Window {
 
     // Variables
     property int taskCounter: 0
-    property date currentDate: new Date()
-    property string stringDate: ""
     property bool isDeleting: false
 
     // Colors here
     property bool mode: true // False = dark mode, True = light mode
     property color trashColor: mode ? "red" : "#850900"
+    property color trashDeletingColor: mode ? "#ff6a00" : "#ab4700"
     property color plusColor: mode ? "blue" : "#03076b"
     property color borderColor: mode ? "#ff9991" : "red"
     property color bgColor: mode ? "white" : "#171716"
@@ -33,6 +32,7 @@ Window {
     property color inputBorderNormal: mode ? "#b3b3b3" : "#4d4d4d"
     property color inputBorderError: mode ? "#ff5555" : "#ff3333"
     property color inputBorderValid: mode ? "#55aa55" : "#33aa33"
+    property color taskFinished: mode ? "#37cc12": "#219404"
 
     color: bgColor
 
@@ -132,6 +132,11 @@ Window {
                 color: mode ? "#e0e0e0" : "#303030"
                 border.width: 1
                 border.color: mode ? "#c0c0c0" : "#505050"
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                }
             }
             onClicked: {
                 root.mode = !root.mode
@@ -148,7 +153,7 @@ Window {
 
         TrashButton {
             radius: 25
-            col: root.trashColor
+            col: root.isDeleting ? root.trashDeletingColor : root.trashColor
             onClicked: {
                 root.isDeleting = !root.isDeleting
             }
@@ -175,7 +180,7 @@ Window {
 
     function validateInput() {
         let isValidName = taskPopup.taskName.text.length > 0 && taskPopup.taskName.text.length <= 30
-        let isValidDesc = taskPopup.taskDescription.text.length <= 100
+        let isValidDesc = taskPopup.taskDescription.text.length <= 500
         let isValidDate = dateTimeSelector.selectedDate !== ""
 
         taskPopup.addButton.enabled = isValidName && isValidDesc && isValidDate
@@ -195,7 +200,8 @@ Window {
                 deadline: task.deadline,
                 name: task.name,
                 description: task.description,
-                id: task.id
+                id: task.id,
+                finished: task.finished
             });
         }
 
@@ -206,6 +212,8 @@ Window {
         };
 
         tasks.sort(function(a, b) {
+            const finishDiff = a.finished - b.finished;
+            if(finishDiff !== 0) return finishDiff;
             const priorityDiff = priorityValue[a.priority] - priorityValue[b.priority];
             if (priorityDiff !== 0) return priorityDiff;
             const dateA = parseDeadline(a.deadline);
@@ -219,7 +227,8 @@ Window {
                 deadline: tasks[j].deadline,
                 name: tasks[j].name,
                 description: tasks[j].description,
-                id: tasks[j].id
+                id: tasks[j].id,
+                finished: tasks[j].finished
             });
         }
     }
@@ -238,16 +247,18 @@ Window {
         return new Date(year, month, day, hours, minutes);
     }
 
-    function appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance) {
-        console.log("Appending task to model:", id, taskName, taskDeadline, taskDescription, taskImportance);
+    function appendTaskToModel(id, taskName, taskDeadline, taskDescription, taskImportance, finished) {
+        console.log("Appending task to model:", id, taskName, taskDeadline, taskDescription, taskImportance, finished);
         if(id >= root.taskCounter) root.taskCounter = id+1
         lModel.append({
             name: taskName,
             description: taskDescription,
             deadline: taskDeadline,
             priority: taskImportance,
-            id: id
+            id: id,
+            finished: finished
         });
+        sortTasks();
     }
 
     Component.onCompleted: {
@@ -257,12 +268,12 @@ Window {
 
     Connections {
         target: taskManager
-        function onTaskLoaded(id, taskName, taskDeadline, taskDescription, taskImportance) {
+        function onTaskLoaded(id, taskName, taskDeadline, taskDescription, taskImportance, finished) {
             console.log("Task loaded signal received:", id, taskName);
 
             // Ensure the model exists
             if (lModel) {
-                appendTaskToModel(id, taskName, taskDescription, taskDeadline, taskImportance);
+                appendTaskToModel(id, taskName, taskDescription, taskDeadline, taskImportance, finished);
             } else {
                 console.error("ListModel not available when trying to append task");
             }
