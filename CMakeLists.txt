@@ -24,13 +24,13 @@ qt_add_qml_module(appSerenify
         QML_FILES TrashButton.qml
         RESOURCES resources.qrc
         RESOURCES Images/Trash.png
-        RESOURCES Images/placeholder.webp
         QML_FILES Task.qml
         QML_FILES TimeDateSelector.qml
         SOURCES TaskManager.h
         SOURCES TaskManager.cpp
         SOURCES Task.h
         QML_FILES TaskCreator.qml
+        RESOURCES Images/checkmark.png Images/pencil.png
 )
 
 qt_add_resources(appSerenify}_resources
