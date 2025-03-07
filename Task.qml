@@ -25,7 +25,12 @@ Item {
         width: parent.width - 20
         anchors.horizontalCenter: parent.horizontalCenter
         y: 10
-        border.color: root.isDeleting ? root.trashDeletingColor : root.borderColor
+        border.color: root.isDeleting ? root.trashDeletingColor : model.finished === 0 ? root.borderColor : root.taskFinished
+        Behavior on border.color {
+            ColorAnimation {
+                duration: 200
+            }
+        }
         border.width: 2
         radius: 10
         height: 60
@@ -145,11 +150,19 @@ Item {
             }
 
             property string fadeDirection: ""
+            property color hoverColor: root.isDeleting ? root.trashDeletingColor : model.finished === 0 ? root.borderColor : root.taskFinished
+
+            Behavior on hoverColor {
+                ColorAnimation {
+                    duration: 200
+                }
+            }
 
             gradient: Gradient {
                 GradientStop { position: 0.0; color: root.bgColor }
                 GradientStop { position: 0.5; color: root.bgColor }
-                GradientStop { position: 1.0; color: root.isDeleting ? root.trashDeletingColor : root.borderColor }
+                GradientStop { position: 1.0; color: gradientBackground.hoverColor }
+
             }
         }
 
@@ -165,15 +178,26 @@ Item {
                     Layout.bottomMargin: 5
                     id: nameLbl
                     text: model.name
+                    font.strikeout: model.finished
                     font.pointSize: 15
                     font.bold: true
-                    color: root.textColor
+                    color: model.finished===0 ? root.textColor : root.taskFinished
+                    Behavior on color {
+                        ColorAnimation {
+                            duration: 200
+                        }
+                    }
+                    Behavior on font.strikeout {
+                        NumberAnimation {
+                            duration: 200
+                        }
+                    }
                 }
                 Text {
                     id: deadlineLbl
                     text: model.deadline
                     color: root.textColor
-                    Layout.bottomMargin: 6
+                    Layout.bottomMargin: 20
                 }
                 Text {
                     id: descriptionLbl
@@ -183,7 +207,6 @@ Item {
                     color: root.textColor
                     font.pointSize: 8
                     opacity: rec.isContentVisible ? 1 : 0
-
                     // Update the rectangle's expanded height whenever the text changes
                     onTextChanged: {
                         // Force layout update to get correct height
@@ -226,6 +249,8 @@ Item {
 
                             MouseArea {
                                 anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                hoverEnabled: true
                                 onClicked: {
                                     // Start delete animation
                                     rootItem.isBeingDeleted = true;
@@ -264,6 +289,7 @@ Item {
 
                             MouseArea {
                                 anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
                                 onClicked: {
                                     taskPopup.startName = model.name
                                     taskPopup.startDesc = model.description
@@ -295,6 +321,18 @@ Item {
                             color: "green"
                             radius: 20
                             opacity: rec.isContentVisible ? 1 : 0
+
+                            MouseArea {
+                                anchors.fill: parent
+                                cursorShape: Qt.PointingHandCursor
+                                onClicked: {
+                                    if(model.finished===0){
+                                        model.finished = 1;
+                                    }
+                                    else model.finished = 0;
+                                    root.sortTasks();
+                                }
+                            }
 
                             Behavior on opacity {
                                 NumberAnimation { duration: 150 }

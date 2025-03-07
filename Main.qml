@@ -32,6 +32,7 @@ Window {
     property color inputBorderNormal: mode ? "#b3b3b3" : "#4d4d4d"
     property color inputBorderError: mode ? "#ff5555" : "#ff3333"
     property color inputBorderValid: mode ? "#55aa55" : "#33aa33"
+    property color taskFinished: mode ? "#37cc12": "#219404"
 
     color: bgColor
 
@@ -120,6 +121,11 @@ Window {
                 color: mode ? "#e0e0e0" : "#303030"
                 border.width: 1
                 border.color: mode ? "#c0c0c0" : "#505050"
+
+                MouseArea {
+                    anchors.fill: parent
+                    cursorShape: Qt.PointingHandCursor
+                }
             }
             onClicked: {
                 root.mode = !root.mode
@@ -181,7 +187,8 @@ Window {
                 deadline: task.deadline,
                 name: task.name,
                 description: task.description,
-                id: task.id
+                id: task.id,
+                finished: task.finished
             });
         }
 
@@ -192,6 +199,8 @@ Window {
         };
 
         tasks.sort(function(a, b) {
+            const finishDiff = a.finished - b.finished;
+            if(finishDiff !== 0) return finishDiff;
             const priorityDiff = priorityValue[a.priority] - priorityValue[b.priority];
             if (priorityDiff !== 0) return priorityDiff;
             const dateA = parseDeadline(a.deadline);
@@ -205,7 +214,8 @@ Window {
                 deadline: tasks[j].deadline,
                 name: tasks[j].name,
                 description: tasks[j].description,
-                id: tasks[j].id
+                id: tasks[j].id,
+                finished: tasks[j].finished
             });
         }
     }

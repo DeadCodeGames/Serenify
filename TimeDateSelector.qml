@@ -532,10 +532,10 @@ Popup {
                             color: root.textColor
                         }
 
-                        Rectangle {
+                        MouseArea {
                             anchors.fill: parent
-                            radius: 6
-                            color: cancelBtn.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
+                            cursorShape: Qt.PointingHandCursor
+
                         }
                     }
                     onClicked: dateTimePicker.close()
@@ -551,11 +551,6 @@ Popup {
                             anchors.centerIn: parent
                             text: "Ok"
                             color: root.textColor
-                        }
-                        Rectangle {
-                            anchors.fill: parent
-                            radius: 6
-                            color: okBtn.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
                         }
                     }
                     onClicked: {

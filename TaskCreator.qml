@@ -48,11 +48,10 @@ Popup {
         id: headerRect
         width: parent.width
         height: 60
-        color: mode ? "#f0f0f0" : "#252525"
-        radius: 15
+        color: root.bgColor
 
         Text {
-            text: "Create a New Task"
+            text: "Create a new task"
             color: root.textColor
             font.pixelSize: 22
             font.weight: Font.Medium
@@ -269,7 +268,6 @@ Popup {
                         model: taskPriority.popup.visible ? taskPriority.delegateModel : null
 
                         currentIndex: taskPriority.highlightedIndex
-
                     }
 
                     background: Rectangle {
@@ -294,16 +292,20 @@ Popup {
                 id: cancelButton
                 Layout.preferredWidth: 133
                 implicitHeight: 40
-                text: "Cancel"
 
                 background: Rectangle {
                     color: mode ? "#e0e0e0" : "#303030"
                     radius: 6
 
-                    Rectangle {
+                    Text {
+                        anchors.centerIn: parent
+                        text: "Cancel"
+                        color: root.textColor
+                    }
+
+                    MouseArea{
                         anchors.fill: parent
-                        radius: 6
-                        color: cancelButton.pressed ? (mode ? "#c0c0c0" : "#404040") : "transparent"
+                        cursorShape: Qt.PointingHandCursor
                     }
                 }
 
@@ -329,10 +331,13 @@ Popup {
                 Layout.preferredWidth: 133
                 implicitHeight: 40
                 enabled: taskName.text.length > 0 && dateTimeSelector.selectedDate !== ""
-
                 background: Rectangle {
                     color: addButton.enabled ? (addButton.pressed ? root.greenBtnHover : root.greenBtn) : root.greenBtnDisabled
                     radius: 6
+                    MouseArea{
+                        anchors.fill: parent
+                        cursorShape: Qt.PointingHandCursor
+                    }
                 }
 
                 contentItem: Text {
@@ -351,7 +356,8 @@ Popup {
                             deadline: dateTimeSelector.selectedDate,
                             description: taskDescription.text,
                             priority: taskPriority.currentText,
-                            id: root.taskCounter++
+                            id: root.taskCounter++,
+                            finished: 0
                         });
 
                         taskName.text = ""
