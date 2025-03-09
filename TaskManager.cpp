@@ -161,41 +161,6 @@ bool TaskManager::updateTaskDB(int id, const QString &name, const QString &descr
     return true;
 }
 
-QList<QObject*> TaskManager::getTasks() {
-    QList<QObject*> taskList;
-    sqlite3* db;
-    sqlite3_stmt* stmt;
-
-    if (sqlite3_open("tasks.db", &db)) {
-        std::cerr << "Error opening database: " << sqlite3_errmsg(db) << std::endl;
-        return taskList;
-    }
-
-    const char* sql = "SELECT id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished FROM tasks;";
-    if (sqlite3_prepare_v2(db, sql, -1, &stmt, nullptr) == SQLITE_OK) {
-        while (sqlite3_step(stmt) == SQLITE_ROW) {
-
-            //probably gonna fuck something up
-            int id = sqlite3_column_int(stmt, 0);
-            QString taskName = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 1)));
-            QString taskDescription = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 2)));
-            QString taskDeadline = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 3)));
-            QString taskImportance = QString::fromUtf8(reinterpret_cast<const char*>(sqlite3_column_text(stmt, 4)));
-            int taskStateFinished = sqlite3_column_int(stmt, 5);
-
-            Task* task = new Task(id, taskName, taskDescription, taskDeadline, taskImportance, taskStateFinished);
-            taskList.append(task);
-        }
-    } else {
-        std::cerr << "Error preparing statement: " << sqlite3_errmsg(db) << std::endl;
-    }
-
-    sqlite3_finalize(stmt);
-    sqlite3_close(db);
-
-    return taskList;
-}
-
 void TaskManager::insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString &taskPriority, int taskStateFinished) {
     sqlite3* db;
     sqlite3_stmt* stmt;
