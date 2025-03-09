@@ -54,7 +54,7 @@ Popup {
         color: root.bgColor
 
         Text {
-            text: "Create a new task"
+            text: isEditing ? "Edit task" : "Create a new task"
             color: root.textColor
             font.pixelSize: 22
             font.weight: Font.Medium
@@ -375,7 +375,7 @@ Popup {
                                 lModel.get(i).description = taskDescription.text
                                 lModel.get(i).deadline = dateTimeSelector.selectedDate
                                 lModel.get(i).priority = taskPriority.currentText
-                                taskManager.updateTaskDB(taskPopup.currentId, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText, finished);
+                                taskManager.updateTaskDB(taskPopup.currentId, taskName.text, taskDescription.text, dateTimeSelector.selectedDate, taskPriority.currentText, lModel.finished);
                                 break;
                             }
                         }

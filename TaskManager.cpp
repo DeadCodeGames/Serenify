@@ -196,7 +196,7 @@ QList<QObject*> TaskManager::getTasks() {
     return taskList;
 }
 
-void TaskManager::insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString taskPriority, int taskStateFinished) {
+void TaskManager::insertToTable(int id, const QString &taskName, const QString &taskDescription, const QString &taskDeadline, const QString &taskPriority, int taskStateFinished) {
     sqlite3* db;
     sqlite3_stmt* stmt;
 
@@ -223,17 +223,17 @@ void TaskManager::insertToTable(int id, const QString &taskName, const QString &
 
     // Bind values
     sqlite3_bind_int(stmt, 1, id);
-    sqlite3_bind_text(stmt, 2, taskName.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 3, taskDescription.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 4, taskDeadline.toStdString().c_str(), -1, SQLITE_STATIC);
-    sqlite3_bind_text(stmt, 5, taskPriority.toStdString().c_str(), -1, SQLITE_STATIC);
+    sqlite3_bind_text(stmt, 2, taskName.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 3, taskDescription.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 4, taskDeadline.toUtf8().constData(), -1, SQLITE_TRANSIENT);
+    sqlite3_bind_text(stmt, 5, taskPriority.toUtf8().constData(), -1, SQLITE_TRANSIENT);
     sqlite3_bind_int(stmt, 6, taskStateFinished);
 
     // Execute the statement
     if (sqlite3_step(stmt) != SQLITE_DONE) {
         qDebug() << "Error inserting data: " << sqlite3_errmsg(db);
     } else {
-        qDebug() << "Task inserted successfully!";
+        qDebug() << "Task inserted successfully!" << id << " " << taskName << " " << taskDescription << " " << taskDeadline << " " << taskPriority << " " << taskStateFinished << " ";
     }
 
     sqlite3_finalize(stmt);
